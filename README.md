@@ -2,11 +2,16 @@
 
 TabTide is a load-unpacked Brave extension for creating private, local notes tied to the exact full URL currently open in the active tab. It has no search, sync, export, telemetry, network calls, content script, or background worker.
 
-## Install in Brave
+## Clone and install in Brave
+
+```powershell
+git clone https://github.com/AdityaHegde712/TabTide.git
+cd TabTide
+```
 
 1. Open `brave://extensions`.
 2. Turn on **Developer mode**.
-3. Select **Load unpacked** and choose this project directory: `C:\Users\hifia\Projects\PageNoteTaker`.
+3. Select **Load unpacked** and choose the cloned `TabTide` directory.
 4. Pin **TabTide**, open a normal HTTP(S) page, and click its toolbar icon.
 
 ## Data and privacy boundary
