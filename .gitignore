@@ -1,0 +1,4 @@
+node_modules/
+.npm-cache/
+.playwright-browsers/
+.agent-tasks/popup-preview.png

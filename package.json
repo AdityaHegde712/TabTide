@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/spec/*.test.mjs",
+    "test:ui": "node tests/integration/popup-render.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TabTide</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">LOCAL PAGE NOTES</p>
+          <h1>TabTide</h1>
+        </div>
+        <p id="entry-count" class="entry-count" aria-live="polite">0 saved entries</p>
+      </header>
+
+      <p id="status-message" class="status-message" aria-live="polite"></p>
+
+      <section id="list-view">
+        <div class="section-heading">
+          <div>
+            <h2>This page</h2>
+            <p id="current-url" class="current-url"></p>
+          </div>
+          <button id="new-entry" class="button primary" type="button">New entry</button>
+        </div>
+        <div id="this-page-entries" class="entry-list" aria-label="Entries for this page"></div>
+
+        <section class="all-pages-section" aria-labelledby="all-pages-heading">
+          <div class="section-heading compact">
+            <div>
+              <h2 id="all-pages-heading">All pages</h2>
+              <p>Entries from other saved URLs</p>
+            </div>
+          </div>
+          <div id="all-pages-entries" class="entry-list" aria-label="Entries for all other pages"></div>
+        </section>
+      </section>
+
+      <section id="editor-view" hidden aria-labelledby="editor-title">
+        <div class="editor-heading">
+          <button id="back-to-list" class="button ghost" type="button">Back</button>
+          <h2 id="editor-title">New entry</h2>
+        </div>
+        <form id="entry-form">
+          <label for="entry-url">Page URL</label>
+          <input id="entry-url" name="entry-url" type="url" readonly>
+
+          <label for="entry-text">Note</label>
+          <textarea id="entry-text" name="entry-text" rows="6" maxlength="10000000" aria-describedby="note-help" required></textarea>
+          <p id="note-help" class="field-help">The editor grows to 12 lines, then scrolls.</p>
+
+          <div class="editor-actions">
+            <button id="save-entry" class="button primary" type="submit">Save entry</button>
+            <button id="delete-entry" class="button danger" type="button" hidden>Delete entry</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <section id="delete-confirmation" class="confirmation" role="dialog" aria-modal="true" aria-labelledby="delete-title" hidden>
+      <div class="confirmation-card">
+        <h2 id="delete-title">Delete entry?</h2>
+        <p>This permanently removes the note from this browser profile.</p>
+        <div class="editor-actions">
+          <button id="cancel-delete" class="button ghost" type="button">Cancel</button>
+          <button id="confirm-delete" class="button danger" type="button">Delete</button>
+        </div>
+      </div>
+    </section>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

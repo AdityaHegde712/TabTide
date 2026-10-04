@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "TabTide",
+  "description": "Save private notes for the exact page you are viewing.",
+  "version": "1.0.0",
+  "permissions": ["activeTab", "storage"],
+  "icons": {
+    "128": "assets/tabtide-icon.png"
+  },
+  "action": {
+    "default_title": "TabTide",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "128": "assets/tabtide-icon.png"
+    }
+  }
+}
