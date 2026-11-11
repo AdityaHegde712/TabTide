@@ -22,6 +22,16 @@ This is local browser-profile storage, not a standalone JSON file. It is removed
 
 Notes can be created only on HTTP(S) tabs. Brave and Chrome internal pages, extension-management pages, stores, PDFs, and local files show an unavailable state. Existing notes remain readable from the all-pages list.
 
+## URL patterns and entry actions
+
+New entries start with the active page URL. You can replace it with an exact HTTP(S) URL or a pattern that uses `*`.
+
+`*` matches zero or more URL characters. Other regex characters stay literal. For example, `*google.com/*` matches Google URLs and does not match `googleXcom`.
+
+Each saved entry has a copy icon and a red delete icon. Copy writes the stored URL, two blank-line separators, and the note text to the clipboard.
+
+Reloading or updating the extension keeps saved entries in `chrome.storage.local`. Removing the extension clears this local storage.
+
 ## Automated checks
 
 Run the frozen contract suite from the project root:

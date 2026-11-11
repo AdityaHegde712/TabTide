@@ -212,7 +212,26 @@ h2 {
 
 .entry-delete {
   align-self: center;
-  min-height: 30px;
+}
+
+.entry-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-action {
+  display: inline-grid;
+  width: 34px;
+  min-height: 34px;
+  place-items: center;
+  padding: 6px;
+}
+
+.icon-action svg {
+  width: 17px;
+  height: 17px;
+  fill: currentcolor;
 }
 
 .editor-heading {

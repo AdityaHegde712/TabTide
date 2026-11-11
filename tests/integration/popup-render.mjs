@@ -13,6 +13,7 @@ const servedFiles = new Map([
   ["/popup.html", { path: resolve(root, "popup.html"), type: "text/html" }],
   ["/popup.css", { path: resolve(root, "popup.css"), type: "text/css" }],
   ["/popup.js", { path: resolve(root, "popup.js"), type: "text/javascript" }],
+  ["/src/clipboard.js", { path: resolve(root, "src", "clipboard.js"), type: "text/javascript" }],
   ["/src/storage.js", { path: resolve(root, "src", "storage.js"), type: "text/javascript" }],
 ]);
 
@@ -33,6 +34,13 @@ const storedNotes = {
         text: "A note for another page.",
         created_at: "2026-10-03T13:00:00.000Z",
         updated_at: "2026-10-03T13:00:00.000Z",
+      },
+      {
+        id: "wildcard-entry",
+        url: "*example.test/*",
+        text: "A wildcard note for every example page.",
+        created_at: "2026-10-03T14:00:00.000Z",
+        updated_at: "2026-10-03T14:00:00.000Z",
       },
     ],
   },
@@ -71,30 +79,45 @@ try {
         },
       },
     };
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (text) => {
+          globalThis.__copiedEntry = text;
+        },
+      },
+    });
   }, { activeUrl: currentUrl, notes: storedNotes });
 
   await page.goto(popupUrl, { waitUntil: "commit", timeout: 5000 });
   await page.getByText("A note for this exact page.").waitFor({ timeout: 5000 });
 
-  assert.equal(await page.locator("#this-page-entries .entry-row").count(), 1);
+  assert.equal(await page.locator("#this-page-entries .entry-row").count(), 2);
   assert.equal(await page.locator("#all-pages-entries .entry-row").count(), 1);
+  await page.getByText("A wildcard note for every example page.").waitFor({ timeout: 5000 });
   assert.equal(await page.locator("body").evaluate((body) => body.scrollWidth <= window.innerWidth), true);
 
-  await page.locator("#all-pages-entries").getByRole("button", { name: "Delete this entry" }).click();
+  await page.locator("#this-page-entries").getByRole("button", { name: "Copy entry" }).first().click();
+  assert.equal(
+    await page.evaluate(() => globalThis.__copiedEntry),
+    "*example.test/*\n\nA wildcard note for every example page.",
+  );
+
+  await page.locator("#all-pages-entries").getByRole("button", { name: "Delete entry" }).click();
   assert.equal(await page.locator("#delete-confirmation").isVisible(), true);
   await page.getByRole("button", { name: "Delete", exact: true }).click();
   await page.locator("#all-pages-entries .entry-row").waitFor({ state: "detached", timeout: 5000 });
 
-  await page.locator("#this-page-entries .entry-open").click();
+  await page.getByText("A note for this exact page.").click();
   await page.locator("#entry-text").fill("Updated current-page note.");
   await page.getByRole("button", { name: "Save changes" }).click();
   await page.getByText("Updated current-page note.").waitFor({ timeout: 5000 });
 
-  await page.locator("#this-page-entries .entry-open").click();
+  await page.getByText("Updated current-page note.").click();
   await page.getByRole("button", { name: "Delete entry" }).click();
   assert.equal(await page.locator("#delete-confirmation").isVisible(), true);
   await page.getByRole("button", { name: "Delete", exact: true }).click();
-  await page.locator("#this-page-entries .entry-row").waitFor({ state: "detached", timeout: 5000 });
+  await page.getByText("Updated current-page note.").waitFor({ state: "detached", timeout: 5000 });
 
   await page.getByRole("button", { name: "New entry" }).click();
   await page.locator("#entry-text").fill("Line ".repeat(500));
@@ -108,7 +131,7 @@ try {
   await mkdir(previewDirectory, { recursive: true });
   await page.screenshot({ path: previewPath, fullPage: true });
   await page.getByRole("button", { name: "Save entry" }).click();
-  assert.equal(await page.locator("#this-page-entries .entry-row").count(), 1);
+  assert.equal(await page.locator("#this-page-entries .entry-row").count(), 2);
   console.log(`Rendered popup verified and screenshot saved to ${previewPath}`);
 } finally {
   await browser.close();

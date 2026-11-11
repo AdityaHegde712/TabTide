@@ -45,8 +45,9 @@
           <h2 id="editor-title">New entry</h2>
         </div>
         <form id="entry-form">
-          <label for="entry-url">Page URL</label>
-          <input id="entry-url" name="entry-url" type="url" readonly>
+          <label for="entry-url">Page URL or pattern</label>
+          <input id="entry-url" name="entry-url" type="text" readonly aria-describedby="url-help">
+          <p id="url-help" class="field-help">Use <code>*</code> to match any characters. Example: <code>*google.com/*</code>.</p>
 
           <label for="entry-text">Note</label>
           <textarea id="entry-text" name="entry-text" rows="6" maxlength="10000000" aria-describedby="note-help" required></textarea>
@@ -54,7 +55,12 @@
 
           <div class="editor-actions">
             <button id="save-entry" class="button primary" type="submit">Save entry</button>
-            <button id="delete-entry" class="button danger" type="button" hidden>Delete entry</button>
+            <button id="copy-entry" class="button icon-action" type="button" aria-label="Copy entry" title="Copy entry" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8h9v11H9zM6 5h9v2H8v9H6z"/></svg>
+            </button>
+            <button id="delete-entry" class="button danger icon-action" type="button" aria-label="Delete entry" title="Delete entry" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h4v2H4V5h4zm-3 5h14l-1 11H5z"/></svg>
+            </button>
           </div>
         </form>
       </section>

@@ -1,3 +1,4 @@
+import { formatEntryForClipboard } from "./src/clipboard.js";
 import { PageNoteStore, groupEntries, isSaveableText } from "./src/storage.js";
 
 const DELETE_CONFIRMATION_PROMPT = "Delete entry?";
@@ -7,6 +8,7 @@ const elements = {
   backToList: document.querySelector("#back-to-list"),
   cancelDelete: document.querySelector("#cancel-delete"),
   confirmDelete: document.querySelector("#confirm-delete"),
+  copyEntry: document.querySelector("#copy-entry"),
   currentUrl: document.querySelector("#current-url"),
   deleteConfirmation: document.querySelector("#delete-confirmation"),
   deleteEntry: document.querySelector("#delete-entry"),
@@ -93,15 +95,61 @@ function makeEntryRow(entry, showUrl) {
     openButton.append(url);
   }
 
+  const actions = document.createElement("div");
+  actions.className = "entry-actions";
+
+  const copyButton = document.createElement("button");
+  copyButton.className = "button icon-action";
+  copyButton.type = "button";
+  copyButton.setAttribute("aria-label", "Copy entry");
+  copyButton.title = "Copy entry";
+  copyButton.append(createCopyIcon());
+  copyButton.addEventListener("click", async () => {
+    copyButton.disabled = true;
+    try {
+      await navigator.clipboard.writeText(formatEntryForClipboard(entry));
+      setStatus("Entry copied.");
+    } catch {
+      setStatus("Could not copy this entry. Check browser clipboard permission and try again.", true);
+    } finally {
+      copyButton.disabled = false;
+    }
+  });
+
   const deleteButton = document.createElement("button");
-  deleteButton.className = "button danger entry-delete";
+  deleteButton.className = "button danger icon-action entry-delete";
   deleteButton.type = "button";
-  deleteButton.textContent = "Delete";
-  deleteButton.setAttribute("aria-label", "Delete this entry");
+  deleteButton.title = "Delete entry";
+  deleteButton.setAttribute("aria-label", "Delete entry");
+  deleteButton.append(createDeleteIcon());
   deleteButton.addEventListener("click", () => requestDeletion(entry.id));
 
-  row.append(openButton, deleteButton);
+  actions.append(copyButton, deleteButton);
+  row.append(openButton, actions);
   return row;
+}
+
+
+function createIcon(pathData) {
+  const namespace = "http://www.w3.org/2000/svg";
+  const icon = document.createElementNS(namespace, "svg");
+  icon.setAttribute("viewBox", "0 0 24 24");
+  icon.setAttribute("aria-hidden", "true");
+
+  const path = document.createElementNS(namespace, "path");
+  path.setAttribute("d", pathData);
+  icon.append(path);
+  return icon;
+}
+
+
+function createCopyIcon() {
+  return createIcon("M9 8h9v11H9zM6 5h9v2H8v9H6z");
+}
+
+
+function createDeleteIcon() {
+  return createIcon("M9 3h6l1 2h4v2H4V5h4zm-3 5h14l-1 11H5z");
 }
 
 
@@ -147,9 +195,11 @@ function renderEditor() {
 
   elements.editorTitle.textContent = isEditing ? "Edit entry" : "New entry";
   elements.entryUrl.value = isEditing ? entry.url : state.currentUrl ?? "";
+  elements.entryUrl.readOnly = isEditing;
   elements.entryText.value = isEditing ? entry.text : "";
   elements.saveEntry.textContent = isEditing ? "Save changes" : "Save entry";
   elements.deleteEntry.hidden = !isEditing;
+  elements.copyEntry.hidden = !isEditing;
   resizeEditor();
 }
 
@@ -220,8 +270,8 @@ async function saveEntry(event) {
   try {
     if (state.editingId) {
       await store.update(state.editingId, { text });
-    } else if (state.currentUrl) {
-      await store.create({ url: state.currentUrl, text });
+    } else if (elements.entryUrl.value) {
+      await store.create({ url: elements.entryUrl.value, text });
     } else {
       throw new Error("This page does not provide a saveable HTTP or HTTPS URL.");
     }
@@ -233,6 +283,24 @@ async function saveEntry(event) {
     state.saving = false;
     setStatus(describeStorageError(error), true);
     render();
+  }
+}
+
+
+async function copyOpenEntry() {
+  const entry = state.entries.find((candidate) => candidate.id === state.editingId);
+  if (!entry) {
+    return;
+  }
+
+  elements.copyEntry.disabled = true;
+  try {
+    await navigator.clipboard.writeText(formatEntryForClipboard(entry));
+    setStatus("Entry copied.");
+  } catch {
+    setStatus("Could not copy this entry. Check browser clipboard permission and try again.", true);
+  } finally {
+    elements.copyEntry.disabled = false;
   }
 }
 
@@ -288,6 +356,7 @@ elements.backToList.addEventListener("click", returnToList);
 elements.cancelDelete.addEventListener("click", dismissDeletion);
 elements.confirmDelete.addEventListener("click", confirmDeletion);
 elements.deleteEntry.addEventListener("click", () => requestDeletion(state.editingId));
+elements.copyEntry.addEventListener("click", copyOpenEntry);
 elements.entryForm.addEventListener("submit", saveEntry);
 elements.entryText.addEventListener("input", resizeEditor);
 
