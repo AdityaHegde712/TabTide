@@ -16,8 +16,8 @@ Immediate next action: load this project folder from `brave://extensions` and co
    - Evidence: focused red contract failed before `matchesUrlPattern` existed.
 5. [x] Implement V1.1 storage matching and popup controls.
    - Evidence: only `*` becomes wildcard; storage validates URL input; copy and delete icon controls remain accessible.
-6. [/] Validate, commit, and publish V1.1 to `dev`.
-   - Evidence: 17 frozen contracts, syntax, manifest parsing, and mocked Playwright UI checks pass.
-   - Blocker: sandbox Git credentials cannot access `origin`; commit and push require a credential-capable Git environment.
+6. [x] Validate, commit, and publish V1.1 to `dev`.
+   - Evidence: 17 frozen contracts, syntax, manifest parsing, mocked Playwright UI checks, and `git push origin HEAD:dev` passed.
+   - Published commit: `5234a70 feat: add URL patterns and entry actions`.
 
-Immediate next action: commit the verified V1.1 change and push it to `origin/dev` from a credential-capable Git environment.
+Immediate next action: reload TabTide in Brave and verify wildcard matching and clipboard copy in the live extension.

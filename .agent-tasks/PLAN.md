@@ -2,7 +2,7 @@
 
 ## Active phase
 
-V1.1 build and local validation are complete. Publishing to `origin/dev` remains blocked until the sandbox can use the owner's Git credential.
+V1.1 is published to `origin/dev` at commit `5234a70`. Owner reload verification remains the final Brave runtime gate.
 
 ## Interaction flow
 
@@ -32,4 +32,4 @@ Toolbar action opens the saved-entry list. The popup reads the active HTTP(S) ta
 
 - [x] Frozen tests prove wildcard matching, literal regex escaping, editable new-entry URLs, and icon action contracts.
 - [x] Mocked-extension UI verification proves copy, delete confirmation, and wildcard grouping.
-- [ ] A conventional commit is pushed directly to `origin/dev` after validation.
+- [x] A conventional commit is pushed directly to `origin/dev` after validation.
