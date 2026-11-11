@@ -1,9 +1,44 @@
 export const STORE_KEY = "page-note-taker:v1";
 export const STORE_VERSION = 1;
+const MAX_URL_LENGTH = 2048;
 
 
 export function isSaveableText(text) {
   return typeof text === "string" && text.trim().length > 0;
+}
+
+
+export function isSaveableUrl(url) {
+  if (typeof url !== "string" || url.length === 0 || url.length > MAX_URL_LENGTH || /\s/.test(url)) {
+    return false;
+  }
+
+  if (url.includes("*")) {
+    return true;
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+
+export function matchesUrlPattern(currentUrl, storedPattern) {
+  if (typeof currentUrl !== "string" || typeof storedPattern !== "string") {
+    return false;
+  }
+
+  if (currentUrl.length > MAX_URL_LENGTH || storedPattern.length === 0 || storedPattern.length > MAX_URL_LENGTH) {
+    return false;
+  }
+
+  const escapedPattern = storedPattern
+    .replace(/[|\\{}()[\]^$+?.]/g, "\\$&")
+    .replaceAll("*", ".*");
+  return new RegExp(`^${escapedPattern}$`).test(currentUrl);
 }
 
 
@@ -12,7 +47,7 @@ export function groupEntries(entries, currentUrl) {
   const allPages = [];
 
   for (const entry of entries) {
-    if (entry.url === currentUrl) {
+    if (matchesUrlPattern(currentUrl, entry.url)) {
       thisPage.push(entry);
     } else {
       allPages.push(entry);
@@ -67,6 +102,10 @@ export class PageNoteStore {
 
 
   async create({ url, text }) {
+    if (!isSaveableUrl(url)) {
+      throw new Error("A URL must be a valid HTTP(S) URL or a non-empty * pattern under 2,048 characters.");
+    }
+
     if (!isSaveableText(text)) {
       throw new Error("A note must contain non-whitespace text.");
     }
